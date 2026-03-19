@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    int tablero[5][5];
+    int fila, columna;
+    int barcosRestantes = 3;
+
+    // VARIABLES DE CADENAS
+    char jugadores[2][20]; // Arreglo para 2 nombres
+    char barco[15];
+    int turno = 0; // 0 para Jugador 1, 1 para Jugador 2
+
+    // Uso de strcpy para asignar nombre al barco
+    strcpy(barco, "Fragata");
+
+    // Inicializar tablero con agua (0)
+    for(int i = 0; i < 5; i++) {
+        for(int j = 0; j < 5; j++) {
+            tablero[i][j] = 0;
+        }
+    }
+
+    // Colocar barcos manualmente
+    tablero[1][2] = 1;
+    tablero[3][4] = 1;
+    tablero[0][0] = 1;
+
+    printf("--- BIENVENIDO A BATALLA NAVAL (2 JUGADORES) ---\n");
+
+    // 1. Pedir nombre de los dos jugadores
+    for(int i = 0; i < 2; i++) {
+        printf("Introduce el nombre del Jugador %d: ", i + 1);
+        fgets(jugadores[i], sizeof(jugadores[i]), stdin);
+        jugadores[i][strcspn(jugadores[i], "\n")] = 0; // Limpiar el salto de línea
+    }
+
+    // El juego continúa mientras queden barcos
+    while(barcosRestantes > 0) {
+
+        // 2. Mostrar nombre en cada turno
+        printf("\n------------------------------");
+        printf("\nES EL TURNO DE: %s", jugadores[turno]);
+        printf("\n------------------------------");
+
+        // Mostrar tablero
+        printf("\nTablero actual:\n");
+        for(int i = 0; i < 5; i++) {
+            for(int j = 0; j < 5; j++) {
+                if(tablero[i][j] == 2) printf("O ");
+                else if(tablero[i][j] == 3) printf("X ");
+                else printf("~ ");
+            }
+            printf("\n");
+        }
+
+        // Pedir disparo
+        printf("\nBarcos en el mar: %d. %s, indica coordenadas:\n", barcosRestantes, jugadores[turno]);
+        printf("Fila (0-4): ");
+        scanf("%d", &fila);
+        printf("Columna (0-4): ");
+        scanf("%d", &columna);
+
+        // Validar coordenadas
+        if(fila < 0 || fila > 4 || columna < 0 || columna > 4) {
+            printf("Fuera de rango. Pierdes el turno.\n");
+        } else {
+            // Evaluar disparo
+            if(tablero[fila][columna] == 1) {
+                // 4. Mensaje personalizado al acertar (Punto 4 del PDF)
+                printf("\n¡BIEN HECHO %s! Impactaste un %s\n", jugadores[turno], barco);
+                tablero[fila][columna] = 3;
+                barcosRestantes--;
+            } else if(tablero[fila][columna] == 0) {
+                printf("\nAgua...\n");
+                tablero[fila][columna] = 2;
+            } else {
+                printf("\nYa dispararon aquí antes.\n");
+            }
+        }
+
+        // Cambiar turno entre 0 y 1
+        if (turno == 0) turno = 1;
+        else turno = 0;
+
+        // Limpiar el buffer para que fgets no falle en la siguiente vuelta
+        while (getchar() != '\n');
+    }
+
+    printf("\n¡Felicidades! Han hundido toda la flota.\n");
+
+    return 0;
+}
